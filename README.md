@@ -1,57 +1,101 @@
-Wordguesser: a scaffolded (!) ESaaS getting-started assignment
-=============================================================
+# WordGuesser on Rails
 
-(v1.1, September 2015.  Written by Armando Fox and Nick Herson)
-(some edits by mverdicchio 21 September 2015)
-(refinements by Armando Fox September 2017)
+In a [previous assignment](https://github.com/saasbook/hw-sinatra-saas-wordguesser) you created a simple Web app that plays the Wordguesser game.
 
-In this assignment you'll be introduced to part of the basic cycle of creating SaaS in a disciplined way.
+More specifically:
 
-**NOTE: Do not clone this repo to your workspace. Fork it first, then clone your fork.**
+1. You wrote the app's code in its own class, `WordGuesserGame`, which knows nothing about being part of a Web app.
 
+2. You used the Sinatra framework to "wrap" the game code by providing a set of RESTful actions that the player can take, with the following routes:
 
+    * `GET  /new`-- default ("home") screen that allows player to start new game
+    * `POST /create` -- actually creates the new game
+    * `GET  /show` -- show current game status and let player enter a move
+    * `POST /guess` -- player submits a letter guess
+    * `GET  /win`   -- redirected here when `show` action detects game won
+    * `GET  /lose`  -- redirected here when `show` action detects game lost
 
-Learning Goals
---------------
-After completing this assignment, you will be able to:
+3. To maintain the state of the game between (stateless) HTTP requests, you stored a copy of the `WordGuesserGame` instance itself in the `session[]` hash provided by Sinatra, which is an abstraction for storing information in cookies passed back and forth between the app and the player's browser.
 
-* Create and deploy simple SaaS apps in your development environment, and deploy them to the public cloud
-* Practice the basic workflow of test-driven development (TDD), in which tests are written before the code (so they fail when first run) and code is then added to make them pass
-* Understand how SaaS frameworks such as Sinatra support the conceptual components of a three-tier SaaS application architecture
-* Understand the challenges of adapting a non-SaaS application to a SaaS environment, including how to identify and manage application state
-* Understand one use case of service-oriented architecture, in which your SaaS app relies on an external service's API (application programming interface) to provide part of the SaaS app's functionality.
+In this assignment, you'll reuse the *same* game code but "wrap" it in a simple Rails app instead of Sinatra.
 
-Prerequisites
--------------
-* You should be familiar with Ruby basics, for example by completing the Ruby Intro or Ruby Calisthenics assignment.
-* You should have read [ESaaS](http://www.saasbook.info) Chapter 2, "The Architecture of SaaS Applications", and watched the accompanying videos in the [MOOC](http://www.saas-class.org).
-* You should be comfortable with basic Git usage and how to push your code to GitHub, as described in Appendix A of [ESaaS](http://www.saasbook.info).
-* You will need "survival level" Unix command-line skills and facility with an editor to edit code files.
+## Learning Goals
 
-**NOTE: You may find the [Sinatra documentation](https://sinatrarb.com) helpful to have on hand.**
+Understand the differences between how Rails and Sinatra handle various aspects of constructing SaaS, including: 
 
-Introduction
-------------
-The full Agile/XP cycle we follow in ESaaS includes talking to the customer, using BDD to develop scenarios, turning those scenarios into runnable integration/acceptance tests with Cucumber, using those scenarios plus TDD to drive the creation of actual code, and deploying the result of each iteration's work to the cloud.
+* how routes are defined and mapped to actions; 
+* the directory structure used by each framework;
+* how an app is started and stopped; 
+* how the app's behavior can be inspected by looking at logs or invoking a debugger. 
 
-In this introductory assignment, we've provided RSpec unit tests to let you use TDD to develop game logic for a word-guessing game.  In the full Agile/XP cycle, you'd develop these tests yourself as you code.
+## 1. Run the App
 
-You'll then use the Sinatra framework to make the Wordguesser game available as SaaS. Adapting the game logic for SaaS will introduce you to thinking about RESTful routes and service-oriented architecture. As you develop the "SaaS-ified" Wordguessing game, you'll use Cucumber to describe how gameplay will work from the player's point of view and as "full stack" integration tests that will drive SaaS development.  In the full Agile/XP cycle, you'd develop Cucumber scenarios yourself based on consultation with the customer, and create the necessary *step definitions* (Cucumber code that turns plain-English scenarios into runnable tests).  In this assignment we provide both the scenarios and step definitions for you.
+**NOTE: You may find these [Rails guides](http://guides.rubyonrails.org/v4.2/) and the [Rails reference documentation](http://api.rubyonrails.org/v4.2.9/) helpful to have on hand.**
 
-You'll deploy your game to the cloud using Heroku, giving you experience in automating SaaS deployment.
+Like substantially all Rails apps, you can get this one running by doing these steps:
 
-**Why Sinatra?** 
+1. Clone or fork the [repo](https://github.com/saasbook/hw-rails-wordguesser)
 
-This assignment uses the simple [Sinatra](https://github.com/sinatra/sinatra) framework rather than Rails, so that you can focus on tools, mechanics, and SaaS concepts, all of which will readily map to Rails later.  Since our app doesn't have a database and has very few functions, Sinatra is an easy way to get started.
+2. Change into the app's root directory `hw-rails-wordguesser`
 
-Contents
----------
+3. Run `bundle install --without production`
 
-* Part 0: [Demystifying SaaS app creation](docs/part_0_create_saas_app.md)
-* Part 1: [Wordguesser](docs/part_1_wordguesser.md)
-* Part 2: [RESTful thinking for Wordguesser](docs/part_2_restful_thinking.md)
-* Part 3: [Connecting WordGuesserGame to Sinatra](docs/part_3_connecting_wordguesser_to_sinatra.md)
-* Part 4: [Introducing Cucumber](docs/part_4_cucumber.md)
-* Part 5: [Corner Cases](docs/part_5_corner_cases.md)
-* Part 6: [Conclusion](docs/part_6_conclusion.md)
-* Part 7: [Optional Challenge Assignment](docs/part_7_optional_challenge.md)
+4. | Local Development                      	| Codio                                                     	|
+    |----------------------------------------	|-----------------------------------------------------------	|
+    | Run `rails server` to start the server 	| Run <br>`rails server -b 0.0.0.0`<br> to start the server 	|
+
+### To view your site in Codio
+Use the Preview button that says "Project Index" in the top tool bar. Click the drop down and select "Box URL" 
+
+![.guides/img/BoxURLpreview](https://global.codio.com/content/BoxURLpreview.png)
+
+For subsequent previews, you will not need to press the drop down -- your button should now read "Box URL".
+
+**Q1.1.**  What is the goal of running `bundle install`?
+# การติดตั้ง Bundle เป็นคำสั่งในโปรเกจต์ Ruby เป้าหมายของการรัน Bundle คือเพื่อติดตั้งเวอร์ชั่น gems ที่ต้องการ
+**Q1.2.**  Why is it good practice to specify `--without production` when running  it on your development computer?
+# ช่วยลดระยะเวลาในการติดตั้ง
+**Q1.3.** 
+(For most Rails apps you'd also have to create and seed the development database, but like the Sinatra app, this app doesn't use a database at all.)
+# Sinatra app จะมีความเรียบง่ายในการทำงานมากกว่าเเละมีความง่ายในการติดตั้งและการปรับใช้ ส่วน ในแอปพลิเคชัน Ruby on Rails ใช้เพื่อเติมฐานข้อมูลด้วยข้อมูลที่กำหนดไว้ล่วงหน้า ข้อมูลนี้อาจรวมถึงบัญชีผู้ใช้เริ่มต้น ผลิตภัณฑ์ตัวอย่าง หรือบันทึกอื่น ๆ ที่จำเป็นสำหรับแอปพลิเคชันในการทำงานอย่างถูกต้อง
+Play around with the game to convince yourself it works the same as the Sinatra version.
+
+## 2. Where Things Are
+
+Both apps have similar structure: the user triggers an action on a game via an HTTP request; a particular chunk of code is called to "handle" the request as appropriate; the `WordGuesserGame` class logic is called to handle the action; and usually, a view is rendered to show the result.  But the locations of the code corresponding to each of these tasks is slightly different between Sinatra and Rails.
+
+**Q2.1.** Where in the Rails app directory structure is the code corresponding to the `WordGuesserGame` model?
+# /workspaces/ruby-2/hw-rails-wordguesser/app/models/word_guesser_game.rb
+**Q2.2.** In what file is the code that most closely corresponds to the  logic in the Sinatra apps' `app.rb` file that handles incoming user actions?
+# game_controllers.rb
+**Q2.3.** What class contains that code?
+# class GameController
+**Q2.4.** From what other class (which is part of the Rails framework) does that class inherit? 
+# class ApplicationController
+**Q2.5.** In what directory is the code corresponding to the Sinatra app's views (`new.erb`, `show.erb`, etc.)?  
+# /workspaces/ruby-2/hw-rails-hangperson/app/views/game/new.html.erb
+# /workspaces/ruby-2/hw-rails-hangperson/app/views/game/show.html.erb
+**Q2.6.** The filename suffixes for these views are different in Rails than they were in the Sinatra app.  What information does the rightmost suffix of the filename  (e.g.: in `foobar.abc.xyz`, the suffix `.xyz`) tell you about the file contents?  
+# ในชื่อไฟล์เช่น index.html.erb ส่วนต่อท้าย .html.erb จะให้ข้อมูลเกี่ยวกับเนื้อหาและรูปแบบของไฟล์
+**Q2.7.** What information does the  other suffix tell you about what Rails is being asked to do with the file?
+# รูปแบบการจัดเก็บข้อมูลของไฟล์แต่ละชนิดและเนื้อหาของข้อมูลในไฟล์
+**Q2.8.** In what file is the information in the Rails app that maps routes (e.g. `GET /new`)  to controller actions?  
+# Config/routes.rb
+**Q2.9.** What is the role of the `:as => 'name'` option in the route declarations of `config/routes.rb`?  (Hint: look at the views.)
+# คือการสร้าง route ที่มีชื่อ สามารถใช้เพื่อสร้าง URL และผู้ช่วยเหลือเส้นทางในแอปพลิเคชัน โดยจะให้ชื่อเชิงสัญลักษณ์แก่เส้นทาง ทำให้สะดวกยิ่งขึ้นและอ่านง่ายในการอ้างอิงเส้นทางนั้นตลอดทั้งโค้ด
+
+## 3. Session
+
+Both apps ensure that the current game is loaded from the session before any controller action occurs, and that the (possibly modified) current game is replaced in the session after each action completes.
+
+**Q3.1.** In the Sinatra version, `before do...end` and `after do...end` blocks are used for session management.  What is the closest equivalent in this Rails app, and in what file do we find the code that does it?
+# - - -
+**Q3.2.** A popular serialization format for exchanging data between Web apps is [JSON](https://en.wikipedia.org/wiki/JSON).  Why wouldn't it work to use JSON instead of YAML?  (Hint: try replacing `YAML.load()` with `JSON.parse()` and `.to_yaml` with `.to_json` to do this test.  You will have to clear out your cookies associated with `localhost:3000`, or restart your browser with a new Incognito/Private Browsing window, in order to clear out the `session[]`.  Based on the error messages you get when trying to use JSON serialization, you should be able to explain why YAML serialization works in this case but JSON doesn't.)
+# เหตุผลหลักที่ JSON ไม่สามารถแทนที่ YAML เป็นเพราะการจัดเก็บข้อมูลที่แตกต่างกันและรูปแบบที่กำหนดส่วนมากจะเป็น YAML
+
+## 4. Views
+
+**Q4.1.** In the Sinatra version, each controller action ends with either `redirect` (which as you can see becomes `redirect_to` in Rails) to redirect the player to another action, or `erb` to render a view.  Why are there no explicit calls corresponding to `erb` in the Rails version? (Hint: Based on the code in the app, can you discern the Convention-over-Configuration rule that is at work here?)
+# ใน Sinatra การเรียก erb เป็นสิ่งจำเป็นในการแสดงผล เนื่องจาก Sinatra ไม่มีแบบแผนที่เข้มงวดสำหรับการดูตำแหน่งไฟล์หรือชื่อ นักพัฒนาซอฟต์แวร์ต้องระบุไฟล์เทมเพลตที่จะแสดงผล
+
+... (18 บรรทัด)

@@ -1,5 +1,6 @@
 class WordGuesserGame
   attr_accessor :word, :guesses, :wrong_guesses
+  #hello
   # add the necessary class methods, attributes, etc. here
   # to make the tests in spec/wordguesser_game_spec.rb pass.
 
