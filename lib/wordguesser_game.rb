@@ -26,19 +26,17 @@ class WordGuesserGame
   end
 
   def word_with_guesses
-    @word.gsub(/./)  { |letter| @guesses.include?(letter) ? letter : '-' }
+    display = ''
+    @word.chars do |char|
+      display += @guesses.include?(char) ? char : '-'
+    end
+    display
   end
 
   def check_win_or_lose
-    return :play if @word.blank?
-
-    if word_with_guesses == @word
-      :win
-    elsif @wrong_guesses.length > 6
-      :lose
-    else
-      :play
-    end
+    return :win if word_with_guesses == @word
+    return :lose if @wrong_guesses.length >= 6
+    :play
   end
 
   # You can test it by installing irb via $ gem install irb
