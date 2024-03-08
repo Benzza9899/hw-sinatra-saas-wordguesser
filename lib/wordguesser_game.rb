@@ -1,10 +1,8 @@
+# frozen_string_literal: true
+
+# Represents a word guessing game.
 class WordGuesserGame
   attr_accessor :word, :guesses, :wrong_guesses
-  #hello
-  # add the necessary class methods, attributes, etc. here
-  # to make the tests in spec/wordguesser_game_spec.rb pass.
-
-  # Get a word from remote "random word" service
 
   def initialize(word)
     @word = word
@@ -12,12 +10,12 @@ class WordGuesserGame
     @wrong_guesses = ''
   end
 
+  # Make a guess in the game.
   def guess(letter)
-    if letter.nil? || letter !~ /\A[a-zA-Z]\Z/i # match single letter,ignoring case
-      raise ArgumentError
-    end
+    raise ArgumentError if letter.nil? || letter !~ /\A[a-zA-Z]\Z/i
+
     letter = letter[0].downcase
-    if  @word.include?(letter) && !@guesses.include?(letter)
+    if @word.include?(letter) && !@guesses.include?(letter)
       @guesses += letter
     elsif !@word.include?(letter) && !@wrong_guesses.include?(letter)
       @wrong_guesses += letter
@@ -26,6 +24,7 @@ class WordGuesserGame
     end
   end
 
+  # Returns the word with guessed letters filled in.
   def word_with_guesses
     display = ''
     @word.chars do |char|
@@ -34,23 +33,21 @@ class WordGuesserGame
     display
   end
 
+  # Check if the game is won, lost, or still in progress.
   def check_win_or_lose
     return :win if word_with_guesses == @word
     return :lose if @wrong_guesses.length >= 6
+
     :play
   end
 
-  # You can test it by installing irb via $ gem install irb
-  # and then running $ irb -I. -r app.rb
-  # And then in the irb: irb(main):001:0> WordGuesserGame.get_random_word
-  #  => "cooking"   <-- some random word
-  def self.get_random_word
+  # Get a random word from a remote service.
+  def self.random_word
     require 'uri'
     require 'net/http'
     uri = URI('http://randomword.saasbook.info/RandomWord')
-    Net::HTTP.new('randomword.saasbook.info').start { |http|
-      return http.post(uri, "").body
-    }
+    Net::HTTP.new('randomword.saasbook.info').start do |http|
+      return http.post(uri, '').body
+    end
   end
-
 end
